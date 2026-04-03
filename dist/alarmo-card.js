@@ -740,6 +740,7 @@ var ye=e=>(t,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(e,t)}):
       --control-button-border-radius: 28px;
       --mdc-icon-size: 24px;
       font-size: 24px;
+      touch-action: manipulation;
     }
     .submit {
       --control-button-background-color: var(--green-color);
