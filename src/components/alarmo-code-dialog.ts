@@ -48,7 +48,9 @@ export class AlarmoCodeDialog
 
   @state() private _params?: CodeDialogParams;
 
-  @state() private _input = '';
+  private _input = '';
+
+  @query('#code') private _codeField?: any;
 
   @state() private _showClearButton = false;
 
@@ -92,7 +94,7 @@ export class AlarmoCodeDialog
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
     if (changedProps.has('_params') || !this._params) return true;
-    else if (changedProps.has('_input')) return true;
+    else if (changedProps.has('_showClearButton')) return true;
     else if (!oldHass) return true;
     else if (oldHass.states[this._params!.entity_id] !== this.hass!.states[this._params!.entity_id]) {
       const oldState = oldHass.states[this._params!.entity_id] as AlarmoEntity;
@@ -133,26 +135,26 @@ export class AlarmoCodeDialog
   }
 
   private _showCodeError() {
-    const inputField = this.shadowRoot?.querySelector('#code');
-    if (inputField) {
-      inputField.classList.remove('error');
-      inputField.classList.add('error');
-      (inputField as any).invalid = true;
+    if (this._codeField) {
+      this._codeField.classList.remove('error');
+      this._codeField.classList.add('error');
+      this._codeField.invalid = true;
     }
   }
 
   private _clearCodeError() {
-    const inputField = this.shadowRoot?.querySelector('#code');
-    if (inputField && inputField.classList.contains('error')) {
-      inputField.classList.remove('error');
-      (inputField as any).invalid = false;
+    if (this._codeField && this._codeField.classList.contains('error')) {
+      this._codeField.classList.remove('error');
+      this._codeField.invalid = false;
       this._input = '';
+      this._codeField.value = '';
       this._cancelCodeClearTimer();
     }
   }
 
   private _clearCode() {
     this._input = '';
+    if (this._codeField) this._codeField.value = '';
     this._clearCodeError();
     this._cancelCodeClearTimer();
   }
@@ -206,11 +208,13 @@ export class AlarmoCodeDialog
     this._clearCodeError();
     this._setCodeClearTimer();
     this._input = this._input + val;
+    if (this._codeField) this._codeField.value = this._input;
     this._showClearButton = true;
   }
 
   private _clear(): void {
     this._input = "";
+    if (this._codeField) this._codeField.value = '';
     this._showClearButton = false;
   }
 
